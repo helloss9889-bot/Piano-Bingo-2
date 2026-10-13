@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Piano Practice Bingo</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f0ff;--surface:#fff;--ink:#241a4a;--muted:#6a6290;--line:#d9d2f5;--accent:#6b3fd4;--accent-ink:#fff;--gold:#ffbe1f;--pink:#ff5d8f;--ok:#12a594;
+--t1:#ffe3ec;--t2:#dff4ff;--t3:#fff2c7;--t4:#e3f8e9;--t5:#eadfff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#150f2e;--surface:#211848;--ink:#f1edff;--muted:#a79fd1;--line:#3a2f6b;--accent:#a98bff;--accent-ink:#150f2e;--t1:#4a2140;--t2:#1d3550;--t3:#4a3d16;--t4:#18422f;--t5:#35275f}}
+:root[data-theme="dark"]{--bg:#150f2e;--surface:#211848;--ink:#f1edff;--muted:#a79fd1;--line:#3a2f6b;--accent:#a98bff;--accent-ink:#150f2e;--t1:#4a2140;--t2:#1d3550;--t3:#4a3d16;--t4:#18422f;--t5:#35275f}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:700 17px/1.45 Nunito,system-ui,sans-serif}
+h1,h2,.display{font-family:Fredoka,Nunito,system-ui,sans-serif;font-weight:600;margin:0;line-height:1.1}
+#app{max-width:720px;margin:0 auto;padding:20px 16px 40px}
+button{font:inherit;cursor:pointer;border:0;border-radius:999px;padding:12px 22px;font-weight:800;background:var(--accent);color:var(--accent-ink)}
+button.ghost{background:transparent;color:var(--muted);padding:8px 12px}
+button.alt{background:var(--surface);color:var(--ink);border:2px solid var(--line)}
+button:focus-visible,input:focus-visible,.tile:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+h1{font-size:34px}
+.sub{color:var(--muted);margin:2px 0 0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+.tile{position:relative;aspect-ratio:1;border-radius:22px;border:3px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px;font-size:clamp(40px,12vw,76px);line-height:1}
+.tile:nth-child(5n+1){background:var(--t1)}.tile:nth-child(5n+2){background:var(--t2)}.tile:nth-child(5n+3){background:var(--t3)}.tile:nth-child(5n+4){background:var(--t4)}.tile:nth-child(5n){background:var(--t5)}
+.tile .lbl{font:800 clamp(11px,2.6vw,14px)/1.15 Nunito,sans-serif;color:var(--ink);text-align:center}
+.tile.done{filter:saturate(.4)}
+.tile.done .em{opacity:.35}
+.tile svg{position:absolute;inset:14%;width:72%;height:72%}
+.tile.win{border-color:var(--gold);box-shadow:0 0 0 4px color-mix(in srgb,var(--gold) 40%,transparent)}
+.banner{background:var(--gold);color:#3a2a00;border-radius:20px;padding:14px 18px;margin:14px 0}
+.banner .display{font-size:26px}
+.bar{height:12px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--ok);border-radius:99px}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:24px;padding:20px}
+.head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.chip{display:inline-block;background:var(--t5);padding:4px 12px;border-radius:99px;font-size:14px;margin-bottom:8px}
+.card h2{font-size:28px}
+.range{font-size:22px;margin:6px 0 0;color:var(--accent)}
+.timer{border:2px solid var(--ink);border-radius:16px;padding:8px 14px;text-align:center;min-width:112px}
+.timer b{display:block;font:600 34px/1 Fredoka,sans-serif;font-variant-numeric:tabular-nums}
+.timer small{color:var(--muted)}
+ul{list-style:none;margin:18px 0 0;padding:0}
+li label{display:flex;align-items:center;gap:14px;padding:12px 4px;border-top:1px solid var(--line);cursor:pointer}
+li:first-child label{border-top:0}
+li input{width:30px;height:30px;flex:none;accent-color:var(--ok)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;align-items:center}
+.rec{display:flex;flex-direction:column;align-items:center;gap:16px;padding:20px 0}
+.dot{width:110px;height:110px;border-radius:50%;background:var(--pink);border:8px solid var(--surface);box-shadow:0 0 0 4px var(--pink);padding:0}
+.dot.on{animation:pulse 1.2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 14px color-mix(in srgb,var(--pink) 35%,transparent)}}
+@media (prefers-reduced-motion:reduce){.dot.on{animation:none}}
+audio{width:100%}
+.note{color:var(--muted);font-size:15px}
+.warn{background:var(--t3);border-radius:16px;padding:12px 16px;margin:12px 0}
+.big{font-size:96px;line-height:1.1;margin:8px 0}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.cols label{font-size:15px;color:var(--muted)}
+.in2,.in{width:100%;font:700 18px Nunito,sans-serif;padding:12px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.in{font:600 34px Fredoka,sans-serif;letter-spacing:.35em;text-align:center}
+.sec{border-top:1px solid var(--line);padding-top:12px;margin-top:14px}.sec h3{font-size:22px;margin:0}
+.tile.hl{border-color:var(--gold);transform:scale(1.07);box-shadow:0 0 0 5px color-mix(in srgb,var(--gold) 45%,transparent)}
+.ov{position:fixed;inset:0;background:rgba(20,10,50,.6);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9}
+button:disabled{opacity:.45;cursor:default}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
+<script>
+const M=n=>`Can you play with the metronome at ${n}bpm / quaver ♪?`,P=n=>`Play with the metronome at ${n}bpm / quaver ♪`;
+const NOTES='Are you playing all the correct notes?',SLOW=NOTES+' Start with slow practice.',B4='Make sure to practice the first 4 bars before moving to the next 4 bars';
+const TASKS=[
+{id:'s30',e:'🚀',short:'Spartacus (full piece)',piece:'Spartacus',mins:30,tempo:120},
+{id:'s1',e:'🍦',short:'Spartacus 4–13',piece:'Spartacus',range:'B.4, 6, 9, 12–13',mins:15,steps:[NOTES,M(96),M(108),M(120)]},
+{id:'s2',e:'🦄',short:'Spartacus 14–22',piece:'Spartacus',range:'B.14–22',mins:15,steps:['Listen to the metronome (120bpm / quaver ♪) and practice at this speed.','Did you practice with the dynamic changes?']},
+{id:'s3',e:'🎈',short:'Spartacus 23–end',piece:'Spartacus',range:'B.27–28, then B.23–end',mins:15,steps:[SLOW,M(96),M(108),M(120)]},
+{id:'c30',e:'🐙',short:'Le coucou (full piece)',piece:'Le coucou',mins:30,tempo:144},
+{id:'c1',e:'🍩',short:'Coucou 29–39',piece:'Le coucou',range:'B.29–39',mins:15,steps:[SLOW,M(100),M(112),M(144)]},
+{id:'m1',e:'🎁',short:'Mazurka 17–24',piece:'Mazurka',range:'B.17–24',mins:15,steps:[B4,P(76),P(88),P(96)]},
+{id:'m2',e:'⭐',short:'Mazurka 25–32',piece:'Mazurka',range:'B.25–32',mins:15,steps:[B4,P(76),P(88),P(96)]}];
+const LINES=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+const LN=['Top row','Middle row','Bottom row','Left column','Middle column','Right column','Diagonal ↘','Diagonal ↙'];
+const TIMED=['task','A','B','C'];
+const $=s=>document.querySelector(s),app=$('#app'),T=id=>TASKS.find(t=>t.id===id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=s=>{s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+let ID=null,S=null,tick=null,gate=null,gateErr=false,idErr='',spin=false,recMsg='';
+let recState='idle',rec,chunks=[],blob=null,url=null,recTick,recSecs=0;
+let dl={save:async({filename,data})=>{const u=URL.createObjectURL(data),a=document.createElement('a');a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}};
+if(window.claude&&window.claude.use)window.claude.use('downloads').then(d=>{dl=d;render()}).catch(()=>{});
+
+function fresh(){const ids=TASKS.map(t=>t.id).sort(()=>Math.random()-.5);ids.splice(4,0,'free');return{order:ids,done:{free:true},checks:{},secs:{},log:{},block:{ids:[],sum:0},active:null}}
+function loadS(id){try{const s=JSON.parse(localStorage.getItem('pb2:'+id));if(s&&s.order&&s.order.length===9)return s}catch(e){}return fresh()}
+function save(){try{localStorage.setItem('pb2:'+ID,JSON.stringify(S))}catch(e){}}
+function enter(id){ID=id;S=loadS(id);try{localStorage.setItem('pb2-current',id)}catch(e){}
+ const a=S.active;if(a&&TIMED.includes(a.stage)){if(tl()<=0){if(a.stage!=='C')a.stage=T(a.id).mins===30?'C':'record'}else tickStart()}render()}
+const winLines=()=>LINES.map((l,i)=>l.every(x=>S.done[S.order[x]])?i:-1).filter(i=>i>=0);
+function tl(){const a=S.active;return a.paused?a.left:Math.max(0,(a.endAt-Date.now())/1000)}
+function tickStart(){clearInterval(tick);tick=setInterval(()=>{const a=S.active;if(!a||!TIMED.includes(a.stage))return;const l=tl(),c=$('#clock');if(c)c.textContent=fmt(l);if(l<=0)expire()},250)}
+function expire(){const a=S.active;if(a.stage==='C'){clearInterval(tick);render();return}goto(T(a.id).mins===30?'C':'record')}
+function goto(st){S.active.stage=st;if(st==='record'||st==='C'){try{if(rec&&rec.state==='recording'){rec.onstop=null;rec.stream.getTracks().forEach(x=>x.stop());rec.stop()}}catch(e){}clearInterval(recTick);recState='idle';blob=null;recMsg=''}if(st==='record')clearInterval(tick);save();render()}
+const setInfo=()=>S.block.sum>=45||!S.block.sum?'Your next draw starts a new 45-minute practice set.':`Practice set: ${S.block.sum} of 45 minutes so far.`;
+
+function render(){
+ const a=S&&S.active,st=!ID?'id':a?a.stage:'board';
+ ({id:idV,board:boardV,reveal:revealV,task:taskV,A:fullA,B:fullB,C:fullC,record:recordV})[st]();
+ if(gate){app.insertAdjacentHTML('beforeend',gateHtml());$('#pw').focus()}
+ window.scrollTo(0,0);
+}
+function idV(){const last=(()=>{try{return localStorage.getItem('pb2-last')||''}catch(e){return ''}})();
+ app.innerHTML=`<div class="card" style="text-align:center"><div class="big">🎹</div><h1>Practice Bingo</h1><p class="sub">Make up a 4-number ID and use the same one every time. Your Bingo card is saved under it.</p><div style="margin:16px 0"><input class="in" id="idin" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="0000" value="${esc(last)}" aria-label="4 number ID"></div>${idErr?`<p class="note" role="alert" style="color:var(--pink)">${idErr}</p>`:''}<button id="go">Start</button></div>`}
+function boardV(){
+ const wl=winLines(),wi=new Set(wl.flatMap(i=>LINES[i])),n=TASKS.filter(t=>S.done[t.id]).length;
+ app.innerHTML=`<div class="top"><div><h1>Lucky Draw</h1><p class="sub">ID ${ID} · ${n} of 8 tasks done</p></div><button class="ghost" id="switch">Switch ID</button></div>
+ ${wl.length?`<div class="banner" role="status"><div class="display">${wl.length} Bingo${wl.length>1?'s':''}! 🎉</div><div>${wl.map(i=>LN[i]).join(', ')}. Show this screen to your teacher to claim your rewards.</div></div>`:''}
+ <div class="grid">${S.order.map((id,i)=>{const t=T(id),d=S.done[id];return `<div class="tile${d&&t?' done':''}${wi.has(i)?' win':''}"><span class="em">${t?t.e:'🌟'}</span>${t?(d?`<span class="lbl">${t.short}</span><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M12 12L88 88M88 12L12 88" stroke="#ff5d8f" stroke-width="12" stroke-linecap="round"/></svg>`:''):'<span class="lbl">FREE</span>'}</div>`}).join('')}</div>
+ <div class="bar" aria-hidden="true"><i style="width:${n/8*100}%"></i></div>
+ ${n<8?`<p class="sub">${setInfo()}</p><div class="row"><button id="draw">🎲 Draw my next item</button><button class="alt" id="savrec">Save Bingo record</button></div>`:`<div class="banner"><div class="display">Card complete! 🌟</div><div>You finished every task. Well done!</div></div><div class="row"><button class="alt" id="savrec">Save Bingo record</button></div>`}
+ ${recMsg?`<p class="note" role="status">${recMsg}</p>`:''}
+ <div class="row"><button class="ghost" id="reset">Teacher: new card</button></div>`}
+function draw(){
+ if(spin)return;recMsg='';
+ const rem=TASKS.filter(t=>!S.done[t.id]);if(S.block.sum>=45)S.block={ids:[],sum:0};
+ let ok=rem.filter(t=>S.block.sum+t.mins<=45);if(!ok.length)ok=rem;
+ const pick=ok[Math.floor(Math.random()*ok.length)],idx=ok.map(t=>S.order.indexOf(t.id)),tiles=[...document.querySelectorAll('.tile')];
+ const seq=[...Array(14)].map(()=>idx[Math.floor(Math.random()*idx.length)]).concat(S.order.indexOf(pick.id));let n=0;spin=true;
+ (function step(){tiles.forEach(t=>t.classList.remove('hl'));tiles[seq[n]].classList.add('hl');
+  if(++n<seq.length)setTimeout(step,90+n*22);
+  else setTimeout(()=>{spin=false;S.block.ids.push(pick.id);S.block.sum+=pick.mins;S.active={id:pick.id,stage:'reveal'};save();render()},800)})();
+}
+function abandon(){const a=S.active,t=T(a.id);S.block.ids=S.block.ids.filter(x=>x!==a.id);S.block.sum=Math.max(0,S.block.sum-t.mins);S.active=null;clearInterval(tick);save();render()}
+function revealV(){const t=T(S.active.id);app.innerHTML=`<div class="card" style="text-align:center"><span class="chip">You drew</span><div class="big">${t.e}</div><h2>${t.mins}-minute task</h2><p class="sub">${S.block.sum} of 45 minutes in this practice set</p><div class="row" style="justify-content:center"><button id="show">Show my task</button></div></div>`}
+function startTask(){const a=S.active,t=T(a.id);a.endAt=Date.now()+t.mins*60000;a.paused=false;a.stage=t.mins===30?'A':'task';recState='idle';blob=null;recMsg='';save();tickStart();render()}
+
+const timerBox=()=>`<div class="timer"><b id="clock">${fmt(tl())}</b><small>countdown</small></div>`;
+const head=(t,chip)=>`<div class="head"><div><span class="chip">${chip}</span><h2>Practice ${t.piece}</h2>${t.range?`<p class="range">${t.range}</p>`:''}</div>${timerBox()}</div>`;
+const foot=()=>`<div class="row"><button class="alt" id="pause">${S.active.paused?'Resume timer':'Pause timer'}</button><button class="ghost" id="skip">Teacher: skip timer</button><button class="ghost" id="back">Teacher: return to card</button></div><p class="note">Your square is locked in. Finish this task before choosing another one.</p>`;
+const chk=(c,k,s)=>`<li><label><input type="checkbox" data-c="${k}" ${c[k]?'checked':''}><span>${s}</span></label></li>`;
+const cks=id=>S.checks[id]||(S.checks[id]={});
+function taskV(){const t=T(S.active.id),c=cks(t.id);app.innerHTML=`<div class="card">${head(t,'15 min task')}<ul>${t.steps.map((s,i)=>chk(c,i,s)).join('')}</ul>${foot()}</div>`}
+function fullA(){const t=T(S.active.id),s=S.secs[t.id]||[],r=recState==='recorded';
+ app.innerHTML=`<div class="card">${head(t,'30 min task · Step 1 of 3')}<div class="warn"><b>Warm up first!</b> Stretch your hands and fingers, or play a scale, before you start.</div><h2 style="margin-top:16px">Record the entire piece</h2>${recBox()}${r?`<p class="sub">Play back your recording. Which 3 sections need more practice? Type the bar numbers.</p><div class="cols">${[0,1,2].map(i=>`<label>Section ${i+1}<input class="in2" data-s="${i}" value="${esc(s[i]||'')}" placeholder="B.__–__"></label>`).join('')}</div>`:''}<div class="row"><button id="next" ${r?'':'disabled'}>Next</button></div>${foot()}</div>`}
+function fullB(){const t=T(S.active.id),s=S.secs[t.id]||[],c=cks(t.id);
+ const q=['Are the notes correct?',`Can you play up to tempo (${t.tempo}bpm / quaver ♪)?`,'Are there any dynamic changes you need to take note of?'];
+ app.innerHTML=`<div class="card">${head(t,'30 min task · Step 2 of 3')}<h2>Practice your 3 sections</h2><p class="sub">Practice the 3 sections you chose. Tick each box when you can say yes.</p>${[0,1,2].map(i=>`<div class="sec"><h3 class="display">Section ${i+1}: ${s[i]?esc(s[i]):'(no bars written)'}</h3><ul>${q.map((x,k)=>chk(c,i+'-'+k,x)).join('')}</ul></div>`).join('')}<div class="row"><button id="next">Next: record the piece again</button></div>${foot()}</div>`}
+function fullC(){const t=T(S.active.id),up=tl()<=0,off=recState==='recording'||recState==='encoding'||!(recState==='recorded'||up);
+ app.innerHTML=`<div class="card">${head(t,'30 min task · Step 3 of 3')}${up?`<div class="warn"><b>Time's up!</b> Finish your recording, then cross off your square.</div>`:''}<h2>Record the entire piece again</h2>${recBox()}<div class="row"><button id="finish" ${off?'disabled':''}>Cross off my square</button></div>${foot()}</div>`}
+function recordV(){const t=T(S.active.id),b=recState==='recording'||recState==='encoding';
+ app.innerHTML=`<div class="card"><span class="chip">Time's up!</span><h2>Record what you have practiced</h2><p class="sub">${t.piece}${t.range?' · '+t.range:''}</p>${recBox()}<div class="row"><button id="finish" ${b?'disabled':''}>Cross off my square</button></div></div>`}
+
+function recBox(){
+ const can=!!(navigator.mediaDevices&&window.MediaRecorder),m=recMsg?`<p class="note" role="status">${recMsg}</p>`:'';
+ if(recState==='encoding')return `<div class="rec"><div class="display">Preparing your MP3…</div></div>`;
+ if(recState==='recorded')return `<div class="rec"><audio id="pl" controls src="${url}"></audio><div class="row"><button class="alt" id="replay">⟲ Replay from the start</button><button id="save">Save recording</button><button class="alt" id="again">Record again</button></div>${m}</div>`;
+ return `<div class="rec"><button class="dot${recState==='recording'?' on':''}" id="recbtn" aria-label="${recState==='recording'?'Stop recording':'Start recording'}"></button><div class="display" id="rt">${recState==='recording'?fmt(recSecs):'Tap to record'}</div>${m}${can?'':'<p class="note">Recording is not available in this browser.</p>'}</div>`}
+async function toMp3(raw){
+ const Ctx=window.AudioContext||window.webkitAudioContext,ctx=new Ctx();
+ const buf=await ctx.decodeAudioData(await raw.arrayBuffer());ctx.close();
+ const ch=buf.getChannelData(0),n=ch.length,pcm=new Int16Array(n);
+ for(let i=0;i<n;i++){const v=Math.max(-1,Math.min(1,ch[i]));pcm[i]=v<0?v*32768:v*32767}
+ const enc=new lamejs.Mp3Encoder(1,buf.sampleRate,96),out=[];
+ for(let i=0,k=0;i<n;i+=1152,k++){const b=enc.encodeBuffer(pcm.subarray(i,i+1152));if(b.length)out.push(b);if(k%300===0)await new Promise(r=>setTimeout(r))}
+ const f=enc.flush();if(f.length)out.push(f);return new Blob(out,{type:'audio/mpeg'});
+}
+async function startRec(){
+ recMsg='';
+ try{
+  const st=await navigator.mediaDevices.getUserMedia({audio:true});
+  chunks=[];rec=new MediaRecorder(st);
+  rec.ondataavailable=e=>e.data.size&&chunks.push(e.data);
+  rec.onstop=async()=>{st.getTracks().forEach(x=>x.stop());clearInterval(recTick);const raw=new Blob(chunks,{type:rec.mimeType||'audio/webm'});
+   recState='encoding';render();
+   try{blob=await toMp3(raw)}catch(e){blob=raw;recMsg='MP3 could not be made on this device, so the file will save in another audio format.'}
+   if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(blob);recState='recorded';render()};
+  rec.start();recState='recording';recSecs=0;render();
+  recTick=setInterval(()=>{recSecs++;const e=$('#rt');if(e)e.textContent=fmt(recSecs)},1000);
+ }catch(e){recState='idle';recMsg='Microphone is blocked. Allow microphone access in your browser settings, then tap the red button again.';render()}
+}
+async function saveRecording(){
+ const t=T(S.active.id),ext=/mpeg/.test(blob.type)?'mp3':/mp4/.test(blob.type)?'mp4':'webm';
+ try{await dl.save({filename:`${ID}-${t.short.replace(/[^A-Za-z0-9]+/g,'-')}.${ext}`,data:blob});recMsg='Saved!'}
+ catch(e){recMsg=e&&/extension/.test(e.code||'')?'This site cannot save MP3 files. Please use the practice link from your teacher.':e&&e.code==='declined'?'Not saved. Tap Save recording to try again.':'Saving did not work. Try again.'}
+ render();
+}
+async function saveRecord(){
+ const wl=winLines(),L=['Piano Practice Bingo record','ID: '+ID,'Saved: '+new Date().toLocaleString(),'',`Bingos: ${wl.length}${wl.length?' ('+wl.map(i=>LN[i]).join(', ')+')':''}`,`Tasks done: ${TASKS.filter(t=>S.done[t.id]).length} of 8`,'',...TASKS.map(t=>`${S.done[t.id]?'[x]':'[ ]'} ${t.short}${S.log[t.id]?' ('+S.log[t.id]+')':''}`)];
+ save();
+ try{await dl.save({filename:`bingo-record-${ID}.txt`,data:new Blob([L.join('\n')],{type:'text/plain'})});recMsg='Saved ✓ Your Bingo record is saved on this device and as a file.'}
+ catch(e){recMsg='Your progress is saved on this device. The record file was not saved.'}
+ render();
+}
+const gateHtml=()=>`<div class="ov" role="dialog" aria-modal="true" aria-label="Teacher password"><div class="card" style="max-width:360px;width:100%"><h2 style="font-size:24px">Teacher password</h2><p class="sub">Ask your teacher to enter the password.</p><input class="in2" id="pw" type="password" autocomplete="off" style="margin-top:12px">${gateErr?'<p class="note" role="alert" style="color:var(--pink)">That password is not right. Try again.</p>':''}<div class="row"><button id="unlock">Unlock</button><button class="alt" id="cancelgate">Cancel</button></div></div></div>`;
+const ask=g=>{gate=g;gateErr=false;render()};
+
+app.addEventListener('click',e=>{
+ const b=e.target.closest('button');if(!b)return;const id=b.id,a=S&&S.active;
+ if(id==='go'){const v=$('#idin').value.trim();if(!/^\d{4}$/.test(v)){idErr='Please type exactly 4 numbers.';return render()}idErr='';try{localStorage.setItem('pb2-last',v)}catch(x){}enter(v)}
+ else if(id==='switch'){ID=null;S=null;try{localStorage.removeItem('pb2-current')}catch(x){}render()}
+ else if(id==='draw')draw();
+ else if(id==='savrec')saveRecord();
+ else if(id==='show')startTask();
+ else if(id==='next')goto(a.stage==='A'?'B':'C');
+ else if(id==='replay'){const p=$('#pl');p.currentTime=0;p.play()}
+ else if(id==='rerec'){recState='idle';goto('A')}
+ else if(id==='pause'){if(a.paused){a.endAt=Date.now()+a.left*1000;a.paused=false}else{a.left=tl();a.paused=true}save();render()}
+ else if(id==='skip')ask('skip');
+ else if(id==='back')ask('back');
+ else if(id==='reset')ask('reset');
+ else if(id==='cancelgate'){gate=null;render()}
+ else if(id==='unlock'){
+  if($('#pw').value.trim().toLowerCase()!=='ateez'){gateErr=true;return render()}
+  const g=gate;gate=null;
+  if(g==='skip')goto('record');
+  else if(g==='back')abandon();
+  else if(g==='reset'){clearInterval(tick);try{localStorage.removeItem('pb2:'+ID)}catch(x){}S=loadS(ID);recMsg='';render()}
+ }
+ else if(id==='recbtn'){if(recState==='recording')rec.stop();else startRec()}
+ else if(id==='again'){recState='idle';blob=null;recMsg='';render()}
+ else if(id==='save'&&blob)saveRecording();
+ else if(id==='finish'){S.done[a.id]=true;S.log[a.id]=new Date().toISOString().slice(0,10);S.active=null;recMsg='';save();render()}
+});
+app.addEventListener('change',e=>{const k=e.target.dataset.c;if(k!==undefined){cks(S.active.id)[k]=e.target.checked;save()}});
+app.addEventListener('input',e=>{const i=e.target.dataset.s;if(i!==undefined){const s=S.secs[S.active.id]||(S.secs[S.active.id]=['','','']);s[+i]=e.target.value;save()}});
+app.addEventListener('keydown',e=>{if(e.key!=='Enter')return;if(e.target.id==='pw')$('#unlock').click();if(e.target.id==='idin')$('#go').click()});
+try{const c=localStorage.getItem('pb2-current');c?enter(c):render()}catch(e){render()}
+</script>
+</body>
+</html>
